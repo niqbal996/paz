@@ -18,11 +18,18 @@ CITY_ESCAPES_ID_TO_MASK = {
     21: 4, 22: 4, 23: 5, 24: 6, 25: 6, 26: 7, 27: 7, 28: 7, 29: 7, 30: 7,
     31: 7, 32: 7, 33: 7, -1: 7}
 
+# SUGAR_BEET_ID_TO_MASK = {0: 0, 1: 255, 2: 128}
+# TODO remove background label?
+SUGAR_BEET_ID_TO_MASK = {0: 0, 255: 1, 128: 2}
+
 
 class FromIdToMask(pr.Processor):
-    def __init__(self, id_to_mask=CITY_ESCAPES_ID_TO_MASK):
+    def __init__(self, dataset='CityScapes'):
         super(FromIdToMask, self).__init__()
-        self.id_to_mask = id_to_mask
+        if dataset == 'CityScapes':
+            self.id_to_mask = CITY_ESCAPES_ID_TO_MASK
+        elif dataset == 'SugarBeet':
+            self.id_to_mask = SUGAR_BEET_ID_TO_MASK
         self.num_classes = len(set(list(self.id_to_mask.values())))
 
     def call(self, image):

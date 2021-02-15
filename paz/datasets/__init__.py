@@ -5,3 +5,4 @@ from .open_images import OpenImages
 from .ferplus import FERPlus
 from .fer import FER
 from .cityscapes import CityScapes
+from .sugarbeet import SugarBeet

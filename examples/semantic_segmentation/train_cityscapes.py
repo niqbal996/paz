@@ -14,7 +14,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from paz.abstract import ProcessingSequence
 from paz.optimization import DiceLoss, FocalLoss, JaccardLoss
 from paz.models import UNET_VGG16, UNET_VGG19, UNET_RESNET50
-from paz.datasets import CityScapes
+from paz.datasets import CityScapes, SugarBeet
 
 from pipelines import PreprocessSegmentationIds
 
@@ -28,7 +28,7 @@ parser.add_argument('-p', '--save_path', default='experiments', type=str,
 parser.add_argument('-m', '--model', default='UNET_VGG16', type=str,
                     choices=['UNET_VGG16', 'UNET_VGG19', 'UNET_RESNET50'])
 parser.add_argument('-d', '--dataset', default='CityScapes', type=str,
-                    choices=['CityScapes'])
+                    choices=['CityScapes', 'SugarBeet'])
 parser.add_argument('-b', '--batch_size', default=5, type=int,
                     help='Batch size used during optimization')
 parser.add_argument('-e', '--epochs', default=100, type=int,
@@ -62,7 +62,11 @@ if args.validation_split not in splits:
     splits = splits + [args.validation_split]
 
 # loading data and instantiating data managers
-name_to_manager = {'CityScapes': CityScapes}
+#TODO make this more generic for future use in case of more than 2 datasets
+if args.dataset == 'CityScapes':
+    name_to_manager = {args.dataset: CityScapes}
+else:
+    name_to_manager = {args.dataset: SugarBeet}
 
 # loading splits
 data_managers, datasets = {}, {}
@@ -78,7 +82,7 @@ for split in splits:
     data_manager = data_managers[split]
     num_classes = data_manager.num_classes
     image_shape = (args.image_size, args.image_size)
-    processor = PreprocessSegmentationIds(image_shape, num_classes)
+    processor = PreprocessSegmentationIds(image_shape, num_classes, dataset=args.dataset)
     sequencers[split] = ProcessingSequence(
         processor, args.batch_size, datasets[split])
 

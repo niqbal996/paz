@@ -30,7 +30,7 @@ class PreprocessSegmentation(pr.SequentialProcessor):
 
 
 class PreprocessSegmentationIds(pr.SequentialProcessor):
-    def __init__(self, image_shape, num_classes, input_name='input_1'):
+    def __init__(self, image_shape, num_classes, input_name='input_1', dataset='CityScapes'):
         super(PreprocessSegmentationIds, self).__init__()
         self.add(pr.UnpackDictionary(['image_path', 'label_path']))
         preprocess_image = pr.SequentialProcessor()
@@ -42,7 +42,7 @@ class PreprocessSegmentationIds(pr.SequentialProcessor):
         preprocess_label = pr.SequentialProcessor()
         preprocess_label.add(pr.LoadImage())
         preprocess_label.add(ResizeImageWithNearestNeighbors(image_shape))
-        preprocess_label.add(FromIdToMask())
+        preprocess_label.add(FromIdToMask(dataset))
 
         self.add(pr.ControlMap(preprocess_image, [0], [0]))
         self.add(pr.ControlMap(preprocess_label, [1], [1]))
