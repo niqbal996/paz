@@ -61,6 +61,8 @@ class MasksToColors(pr.Processor):
         self.colors = colors
         if self.colors is None:
             self.colors = lincolor(self.num_classes, normalized=True)
+        elif self.colors == 'plants':
+            self.colors = [(0, 0, 0), (0, 1, 0), (0, 1, 0)]
 
     def call(self, masks):
         H, W, num_masks = masks.shape

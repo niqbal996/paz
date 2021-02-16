@@ -2,15 +2,16 @@ import tensorflow as tf
 gpus = tf.config.experimental.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(gpus[0], True)
 
-from cityscapes import CityScapes
+from paz.datasets import CityScapes, SugarBeet
 from paz import processors as pr
 from processors import Round, MasksToColors
-from model import UNET_VGG16
+from paz.models import UNET_VGG16
 
 
-label_path = '/home/octavio/Downloads/dummy/gtFine/'
-image_path = '/home/octavio/Downloads/dummy/RGB_images/leftImg8bit/'
-data_manager = CityScapes(image_path, label_path, 'test')
+label_path = '/home/naeem/datasets/structured_cwc/'
+image_path = '/home/naeem/datasets/structured_cwc/'
+# data_manager = CityScapes(image_path, label_path, 'test')
+data_manager = SugarBeet(image_path, label_path, 'val')
 data = data_manager.load_data()
 
 
@@ -37,8 +38,10 @@ input_shape = (128, 128, 3)
 activation = 'softmax'
 freeze = True
 model = UNET_VGG16(num_classes, input_shape, 'imagenet', freeze, activation)
-post_process = PostprocessSegmentation(model)
-model.load_weights('experiments/model.tf')
+post_process = PostprocessSegmentation(model, colors='plants')
+# Use the colors='None' the default option for CityScapes dataset
+# post_process = PostprocessSegmentation(model)
+model.load_weights('./experiments/SugarBeet_UNET-VGG16_RUN_00/model.tf')
 
 for sample in data:
     image = post_process(sample)
